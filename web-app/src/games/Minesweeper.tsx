@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Bomb, Flag } from 'lucide-react';
+import GameRulesModal from '../components/GameRulesModal';
+import { ArrowLeft, Bomb, Flag, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const GRID_SIZE = 8; // Slightly larger than python version for better web exp
+const GRID_SIZE = 8;
 const NUM_MINES = 10;
 
 type Cell = {
@@ -18,6 +19,7 @@ const Minesweeper: React.FC = () => {
     const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
     const [mineCount, setMineCount] = useState(NUM_MINES);
     const [timer, setTimer] = useState(0);
+    const [showRules, setShowRules] = useState(false);
 
     useEffect(() => {
         startNewGame();
@@ -32,7 +34,7 @@ const Minesweeper: React.FC = () => {
     }, [gameState]);
 
     const startNewGame = () => {
-        // Initialize grid
+        // ... (existing logic)
         const newGrid: Cell[][] = Array.from({ length: GRID_SIZE }, () =>
             Array.from({ length: GRID_SIZE }, () => ({
                 isMine: false,
@@ -80,6 +82,8 @@ const Minesweeper: React.FC = () => {
         setMineCount(NUM_MINES);
         setTimer(0);
     };
+
+    // ... (rest of game logic methods: revealCell, toggleFlag, checkWinCondition, getCellColor)
 
     const revealCell = (r: number, c: number) => {
         if (gameState !== 'playing' || grid[r][c].isRevealed || grid[r][c].isFlagged) return;
@@ -163,6 +167,13 @@ const Minesweeper: React.FC = () => {
         return colors[count] || 'text-white';
     };
 
+    const rules = [
+        "Reveal all safe squares without detonating a mine.",
+        "Numbers indicate how many mines are adjacent to that square.",
+        "Right-click to flag a square you suspect contains a mine.",
+        "If you click a mine, the game ends."
+    ];
+
     return (
         <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
             <div className="flex items-center justify-between w-full mb-6">
@@ -172,8 +183,21 @@ const Minesweeper: React.FC = () => {
                 <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-orange-500">
                     Minesweeper
                 </h2>
-                <div className="w-10"></div>
+                <button
+                    onClick={() => setShowRules(true)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-red-400"
+                >
+                    <Info className="w-6 h-6" />
+                </button>
             </div>
+
+            <GameRulesModal
+                isOpen={showRules}
+                onClose={() => setShowRules(false)}
+                title="Minesweeper"
+                gameType="logic"
+                rules={rules}
+            />
 
             <div className="glass-panel p-6 rounded-2xl w-full flex flex-col items-center">
 

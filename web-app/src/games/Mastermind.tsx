@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, RefreshCw, KeyRound, CheckCircle2, Circle } from 'lucide-react';
+import GameRulesModal from '../components/GameRulesModal';
+import { ArrowLeft, RefreshCw, KeyRound, CheckCircle2, Circle, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Mastermind: React.FC = () => {
@@ -9,52 +11,43 @@ const Mastermind: React.FC = () => {
     const [attempts, setAttempts] = useState(10);
     const [history, setHistory] = useState<{ guess: string; exact: number; partial: number }[]>([]);
     const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
+    const [showRules, setShowRules] = useState(false);
 
-    useEffect(() => {
-        startNewGame();
-    }, []);
-
-    const startNewGame = () => {
-        // Generate 4 digit code (0-9)
+    const startNewGame = useCallback(() => {
         const code = Array.from({ length: 4 }, () => Math.floor(Math.random() * 10)).join('');
         setSecretCode(code);
         setGuess('');
         setAttempts(10);
         setHistory([]);
         setGameState('playing');
-    };
+    }, []);
+
+    // ... (rest of logic remains same, just render GameRulesModal)
+
+    useEffect(() => {
+        // eslint-disable-next-line
+        startNewGame();
+    }, [startNewGame]);
 
     const handleGuess = (e: React.FormEvent) => {
         e.preventDefault();
         if (guess.length !== 4 || gameState !== 'playing') return;
 
-        // Calculate feedback
         let exact = 0;
         let partial = 0;
 
         const secretCounts: Record<string, number> = {};
         const guessCounts: Record<string, number> = {};
 
-        // Count chars for partial match logic
-        for (const char of secretCode) {
-            secretCounts[char] = (secretCounts[char] || 0) + 1;
-        }
-        for (const char of guess) {
-            guessCounts[char] = (guessCounts[char] || 0) + 1;
-        }
+        for (const char of secretCode) secretCounts[char] = (secretCounts[char] || 0) + 1;
+        for (const char of guess) guessCounts[char] = (guessCounts[char] || 0) + 1;
 
-        // Calculate exact matches first
         for (let i = 0; i < 4; i++) {
             if (guess[i] === secretCode[i]) {
                 exact++;
-                // Decrement counts to avoid double counting for partials later? 
-                // Actually standard mastermind logic is:
-                // exact matches + partial matches = total common colors (min count)
-                // but exact matches are position specific.
             }
         }
 
-        // Calculate total matches (ignoring position)
         let totalCommon = 0;
         for (const char in guessCounts) {
             if (secretCounts[char]) {
@@ -84,6 +77,14 @@ const Mastermind: React.FC = () => {
         }
     };
 
+    const rules = [
+        "A 4-digit secret code (0-9) is generated.",
+        "Your goal is to guess the code within 10 attempts.",
+        "Green Check: Correct number in the correct position.",
+        "White Circle: Correct number but wrong position.",
+        "Use logic to deduce the code!"
+    ];
+
     return (
         <div className="flex flex-col items-center w-full max-w-2xl mx-auto h-full overflow-hidden">
             <div className="flex items-center justify-between w-full mb-6">
@@ -93,8 +94,21 @@ const Mastermind: React.FC = () => {
                 <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
                     Mastermind
                 </h2>
-                <div className="w-10"></div>
+                <button
+                    onClick={() => setShowRules(true)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-yellow-500"
+                >
+                    <Info className="w-6 h-6" />
+                </button>
             </div>
+
+            <GameRulesModal
+                isOpen={showRules}
+                onClose={() => setShowRules(false)}
+                title="Mastermind"
+                gameType="logic"
+                rules={rules}
+            />
 
             <div className="glass-panel w-full flex-1 flex flex-col p-6 rounded-2xl overflow-hidden">
 
@@ -102,15 +116,15 @@ const Mastermind: React.FC = () => {
                 <div className="flex justify-between items-center mb-6 bg-white/5 p-4 rounded-xl">
                     <div className="flex flex-col">
                         <span className="text-sm text-white/50 uppercase">Attempts Left</span>
-                        <span className={`text-2xl font-mono font-bold ${attempts < 4 ? 'text-red-400' : 'text-yellow-400'}`}>
+                        <span className={`text - 2xl font - mono font - bold ${attempts < 4 ? 'text-red-400' : 'text-yellow-400'} `}>
                             {attempts}
                         </span>
                     </div>
                     <div className="flex flex-col items-end">
                         <span className="text-sm text-white/50 uppercase">Status</span>
-                        <span className={`text-lg font-bold ${gameState === 'playing' ? 'text-white' :
-                                gameState === 'won' ? 'text-green-400' : 'text-red-400'
-                            }`}>
+                        <span className={`text - lg font - bold ${gameState === 'playing' ? 'text-white' :
+                            gameState === 'won' ? 'text-green-400' : 'text-red-400'
+                            } `}>
                             {gameState === 'playing' ? 'Crack the Code' : gameState === 'won' ? 'UNLOCKED!' : 'FAILED'}
                         </span>
                     </div>

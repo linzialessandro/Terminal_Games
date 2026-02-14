@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, RefreshCw, Crosshair, Anchor, RotateCcw } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import GameRulesModal from '../components/GameRulesModal';
+import { ArrowLeft, RefreshCw, Crosshair, Anchor, RotateCcw, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const BOARD_SIZE = 10;
@@ -20,6 +21,7 @@ const BattleshipComponent = () => {
     const [gameState, setGameState] = useState<GamePhase>('setup');
     const [turn, setTurn] = useState<'user' | 'computer'>('user');
     const [message, setMessage] = useState('Place your ships!');
+    const [showRules, setShowRules] = useState(false);
 
     // Boards
     const [userBoard, setUserBoard] = useState<CellState[][]>([]);
@@ -36,37 +38,23 @@ const BattleshipComponent = () => {
     const [isHorizontal, setIsHorizontal] = useState(true);
     const [hoverCoords, setHoverCoords] = useState<[number, number][]>([]);
 
-    useEffect(() => {
-        startNewGame();
-    }, []);
+    const createEmptyBoard = useCallback(() => Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill('empty')), []);
 
-    // AI Turn Effect
-    useEffect(() => {
-        if (gameState === 'playing' && turn === 'computer') {
-            const timer = setTimeout(() => {
-                makeComputerMove();
-            }, 1000);
-            return () => clearTimeout(timer);
+    const getShipCoords = (r: number, c: number, length: number, horizontal: boolean): [number, number][] => {
+        const coords: [number, number][] = [];
+        for (let i = 0; i < length; i++) {
+            coords.push([horizontal ? r : r + i, horizontal ? c + i : c]);
         }
-    }, [turn, gameState]);
-
-    const startNewGame = () => {
-        setUserBoard(createEmptyBoard());
-        setComputerBoard(createEmptyBoard());
-        setUserShips({});
-        setComputerShips({});
-        setSunkComputerShips([]);
-        setSunkUserShips([]);
-        setGameState('setup');
-        setTurn('user');
-        setCurrentShipIndex(0);
-        setMessage('Place your Carrier (5 cells)');
-        placeComputerShips();
+        return coords;
     };
 
-    const createEmptyBoard = () => Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill('empty'));
+    const canPlaceShip = (board: CellState[][], coords: [number, number][]) => {
+        return coords.every(([r, c]) =>
+            r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === 'empty'
+        );
+    };
 
-    const placeComputerShips = () => {
+    const placeComputerShips = useCallback(() => {
         const newBoard = createEmptyBoard();
         const newShips: { [key: string]: ShipData } = {};
 
@@ -87,21 +75,99 @@ const BattleshipComponent = () => {
         });
         setComputerBoard(newBoard);
         setComputerShips(newShips);
-    };
+    }, [createEmptyBoard]);
 
-    const getShipCoords = (r: number, c: number, length: number, horizontal: boolean): [number, number][] => {
-        const coords: [number, number][] = [];
-        for (let i = 0; i < length; i++) {
-            coords.push([horizontal ? r : r + i, horizontal ? c + i : c]);
+    const startNewGame = useCallback(() => {
+        setUserBoard(createEmptyBoard());
+        setComputerBoard(createEmptyBoard());
+        setUserShips({});
+        setComputerShips({});
+        setSunkComputerShips([]);
+        setSunkUserShips([]);
+        setGameState('setup');
+        setTurn('user');
+        setCurrentShipIndex(0);
+        setMessage('Place your Carrier (5 cells)');
+        placeComputerShips();
+    }, [createEmptyBoard, placeComputerShips]);
+
+    useEffect(() => {
+        // eslint-disable-next-line
+        startNewGame();
+    }, [startNewGame]);
+
+    const fireAt = (board: CellState[][], ships: { [key: string]: ShipData }, r: number, c: number) => {
+        const cell = board[r][c];
+        if (cell === 'ship') {
+            board[r][c] = 'hit';
+            // Find ship
+            for (const [name, data] of Object.entries(ships)) {
+                if (data.coords.some(([sr, sc]) => sr === r && sc === c)) {
+                    return { hitShipName: name, hitShipLength: SHIP_CONFIG.find(s => s.name === name)!.length };
+                }
+            }
+        } else {
+            board[r][c] = 'miss';
         }
-        return coords;
+        return { hitShipName: null, hitShipLength: 0 };
     };
 
-    const canPlaceShip = (board: CellState[][], coords: [number, number][]) => {
-        return coords.every(([r, c]) =>
-            r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE && board[r][c] === 'empty'
-        );
-    };
+    const makeComputerMove = useCallback(() => {
+        if (gameState !== 'playing') return;
+
+        let r: number, c: number;
+        let valid = false;
+        // Simple random AI (improve later if needed)
+        // Optimization: Don't hit already hit cells
+        let attempts = 0;
+        while (!valid && attempts < 100) {
+            r = Math.floor(Math.random() * BOARD_SIZE);
+            c = Math.floor(Math.random() * BOARD_SIZE);
+            if (userBoard[r][c] !== 'hit' && userBoard[r][c] !== 'miss') {
+                valid = true;
+            }
+            attempts++;
+        }
+        // Fallback if random fails (grid full?)
+        if (!valid) return;
+
+        const newBoard = [...userBoard.map(row => [...row])];
+        const result = fireAt(newBoard, userShips, r!, c!); // TS knows valid r,c
+
+        setUserBoard(newBoard);
+
+        if (result.hitShipName) {
+            const newShips = { ...userShips };
+            newShips[result.hitShipName].hitCount++;
+            setUserShips(newShips);
+
+            if (newShips[result.hitShipName].hitCount === result.hitShipLength) {
+                const newSunk = [...sunkUserShips, result.hitShipName];
+                setSunkUserShips(newSunk);
+                setMessage(`Computer sunk your ${result.hitShipName}!`);
+                if (newSunk.length === SHIP_CONFIG.length) {
+                    setGameState('lost');
+                    setMessage('DEFEAT! Your fleet was destroyed.');
+                    return;
+                }
+            } else {
+                setMessage('Computer HIT your ship!');
+            }
+        } else {
+            setMessage('Computer MISSED!');
+        }
+        setTurn('user');
+    }, [gameState, userBoard, userShips, sunkUserShips]);
+
+    // AI Turn Effect
+    useEffect(() => {
+        if (gameState === 'playing' && turn === 'computer') {
+            const timer = setTimeout(() => {
+                makeComputerMove();
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [turn, gameState, makeComputerMove]);
 
     // --- SETUP PHASE HANDLERS ---
 
@@ -178,66 +244,9 @@ const BattleshipComponent = () => {
         }
     };
 
-    const makeComputerMove = () => {
-        if (gameState !== 'playing') return;
 
-        let r, c;
-        let valid = false;
-        // Simple random AI (improve later if needed)
-        // Optimization: Don't hit already hit cells
-        while (!valid) {
-            r = Math.floor(Math.random() * BOARD_SIZE);
-            c = Math.floor(Math.random() * BOARD_SIZE);
-            if (userBoard[r][c] !== 'hit' && userBoard[r][c] !== 'miss') {
-                valid = true;
-            }
-        }
 
-        const newBoard = [...userBoard.map(row => [...row])];
-        const result = fireAt(newBoard, userShips, r!, c!); // TS knows valid r,c
-
-        setUserBoard(newBoard);
-
-        if (result.hitShipName) {
-            const newShips = { ...userShips };
-            newShips[result.hitShipName].hitCount++;
-            setUserShips(newShips);
-
-            if (newShips[result.hitShipName].hitCount === result.hitShipLength) {
-                const newSunk = [...sunkUserShips, result.hitShipName];
-                setSunkUserShips(newSunk);
-                setMessage(`Computer sunk your ${result.hitShipName}!`);
-                if (newSunk.length === SHIP_CONFIG.length) {
-                    setGameState('lost');
-                    setMessage('DEFEAT! Your fleet was destroyed.');
-                    return;
-                }
-            } else {
-                setMessage('Computer HIT your ship!');
-            }
-        } else {
-            setMessage('Computer MISSED!');
-        }
-        setTurn('user');
-    };
-
-    const fireAt = (board: CellState[][], ships: { [key: string]: ShipData }, r: number, c: number) => {
-        const cell = board[r][c];
-        if (cell === 'ship') {
-            board[r][c] = 'hit';
-            // Find ship
-            for (const [name, data] of Object.entries(ships)) {
-                if (data.coords.some(([sr, sc]) => sr === r && sc === c)) {
-                    return { hitShipName: name, hitShipLength: SHIP_CONFIG.find(s => s.name === name)!.length };
-                }
-            }
-        } else {
-            board[r][c] = 'miss';
-        }
-        return { hitShipName: null, hitShipLength: 0 };
-    };
-
-    // --- RENDER HELPERS ---
+    // ... (render helpers can remain roughly same or be inlined if prefer to keep readable)
 
     const renderGrid = (
         board: CellState[][],
@@ -284,6 +293,13 @@ const BattleshipComponent = () => {
         </div>
     );
 
+    const rules = [
+        "Place your fleet of 5 ships on your grid (Friendly Waters).",
+        "Take turns firing coordinates at the Enemy's Waters.",
+        "Hit ships are marked with red, misses with white.",
+        "Sink all 5 opponent ships to win the game!"
+    ];
+
     return (
         <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4 pb-20">
             <div className="flex items-center justify-between w-full mb-6">
@@ -293,8 +309,21 @@ const BattleshipComponent = () => {
                 <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
                     Battleship
                 </h2>
-                <div className="w-10"></div>
+                <button
+                    onClick={() => setShowRules(true)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-cyan-400"
+                >
+                    <Info className="w-6 h-6" />
+                </button>
             </div>
+
+            <GameRulesModal
+                isOpen={showRules}
+                onClose={() => setShowRules(false)}
+                title="Battleship"
+                gameType="strategy"
+                rules={rules}
+            />
 
             {/* Game Message Area */}
             <div className="glass-panel w-full max-w-3xl p-4 mb-8 text-center rounded-xl bg-blue-900/20 border-blue-500/30">

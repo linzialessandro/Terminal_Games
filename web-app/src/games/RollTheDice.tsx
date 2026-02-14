@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Dices, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from 'lucide-react';
+import GameRulesModal from '../components/GameRulesModal';
+import { ArrowLeft, Dices, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const DiceIcon = ({ value, className }: { value: number; className?: string }) => {
@@ -15,6 +16,7 @@ const RollTheDice: React.FC = () => {
     const [secretRolls, setSecretRolls] = useState<number[]>([]);
     const [gameState, setGameState] = useState<'idle' | 'rolling' | 'revealed'>('idle');
     const [message, setMessage] = useState('');
+    const [showRules, setShowRules] = useState(false);
 
     const roll = () => {
         setGameState('rolling');
@@ -47,6 +49,13 @@ const RollTheDice: React.FC = () => {
         setSecretRolls([]);
     };
 
+    const rules = [
+        "Choose the number of dice you want to roll (1, 2, or 3).",
+        "Click 'Roll Dice' to roll your dice and the secret dice simultaneously.",
+        "The goal is to match the sum of your dice with the sum of the secret dice.",
+        "It's purely a game of luck. Good luck!"
+    ];
+
     return (
         <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
             <div className="flex items-center justify-between w-full mb-8">
@@ -56,8 +65,21 @@ const RollTheDice: React.FC = () => {
                 <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
                     Roll the Dice
                 </h2>
-                <div className="w-10"></div>
+                <button
+                    onClick={() => setShowRules(true)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-pink-300"
+                >
+                    <Info className="w-6 h-6" />
+                </button>
             </div>
+
+            <GameRulesModal
+                isOpen={showRules}
+                onClose={() => setShowRules(false)}
+                title="Roll the Dice"
+                gameType="luck"
+                rules={rules}
+            />
 
             <div className="glass-panel p-6 rounded-2xl w-full flex flex-col items-center gap-6">
 

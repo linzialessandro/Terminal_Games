@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, ArrowLeft, Trophy } from 'lucide-react';
+import GameRulesModal from '../components/GameRulesModal';
+import { RefreshCw, ArrowLeft, Trophy, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const GuessNumber: React.FC = () => {
@@ -11,6 +12,7 @@ const GuessNumber: React.FC = () => {
     const [attempts, setAttempts] = useState(0);
     const [gameOver, setGameOver] = useState(false);
     const [history, setHistory] = useState<{ value: number; result: string }[]>([]);
+    const [showRules, setShowRules] = useState(false);
 
     const startGame = (level: number) => {
         let max = 50;
@@ -62,6 +64,14 @@ const GuessNumber: React.FC = () => {
         setHistory([]);
     };
 
+    const rules = [
+        "Select a difficulty level to determine the range of numbers.",
+        "Enter your guess in the input field.",
+        "I will tell you if your guess is too high or too low.",
+        "Keep guessing until you find the secret number!",
+        "Try to guess it in as few attempts as possible."
+    ];
+
     return (
         <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
             <div className="flex items-center justify-between w-full mb-8">
@@ -71,8 +81,21 @@ const GuessNumber: React.FC = () => {
                 <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
                     Guess the Number
                 </h2>
-                <div className="w-10"></div>
+                <button
+                    onClick={() => setShowRules(true)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-blue-300"
+                >
+                    <Info className="w-6 h-6" />
+                </button>
             </div>
+
+            <GameRulesModal
+                isOpen={showRules}
+                onClose={() => setShowRules(false)}
+                title="Guess the Number"
+                gameType="logic"
+                rules={rules}
+            />
 
             {!difficulty ? (
                 <motion.div

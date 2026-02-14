@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Scissors, Hand, Scroll, RefreshCw, Trophy } from 'lucide-react';
+import GameRulesModal from '../components/GameRulesModal';
+import { ArrowLeft, Scissors, Hand, Scroll, RefreshCw, Trophy, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 type Choice = 'rock' | 'paper' | 'scissors';
@@ -14,6 +15,7 @@ const RockPaperScissors: React.FC = () => {
     const [result, setResult] = useState<GameResult>(null);
     const [isAnimating, setIsAnimating] = useState(false);
     const [matchWinner, setMatchWinner] = useState<'user' | 'computer' | null>(null);
+    const [showRules, setShowRules] = useState(false);
 
     const choices: { id: Choice; icon: React.ElementType; color: string }[] = [
         { id: 'rock', icon: Hand, color: 'text-stone-400' },
@@ -73,12 +75,21 @@ const RockPaperScissors: React.FC = () => {
         setResult(null);
     };
 
+    // ... (getIcon helper)
+
     const getIcon = (choice: Choice | null) => {
         if (!choice) return null;
         const item = choices.find(c => c.id === choice);
         const Icon = item?.icon;
         return Icon ? <Icon size={64} className={item.color} /> : null;
     };
+
+    const rules = [
+        "Choose Rock, Paper, or Scissors against the computer.",
+        "Rock beats Scissors, Scissors beats Paper, Paper beats Rock.",
+        "Win rounds to increase your score.",
+        "First to reach 3 points (with a 2-point lead) wins the match!"
+    ];
 
     return (
         <div className="flex flex-col items-center w-full max-w-4xl mx-auto">
@@ -89,8 +100,21 @@ const RockPaperScissors: React.FC = () => {
                 <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-rose-500">
                     Rock Paper Scissors
                 </h2>
-                <div className="w-10"></div>
+                <button
+                    onClick={() => setShowRules(true)}
+                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-pink-400"
+                >
+                    <Info className="w-6 h-6" />
+                </button>
             </div>
+
+            <GameRulesModal
+                isOpen={showRules}
+                onClose={() => setShowRules(false)}
+                title="Rock Paper Scissors"
+                gameType="luck"
+                rules={rules}
+            />
 
             <div className="glass-panel p-8 rounded-2xl w-full flex flex-col items-center min-h-[500px]">
 
