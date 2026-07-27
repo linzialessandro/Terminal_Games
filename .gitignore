@@ -3,19 +3,26 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Node / web app
+node_modules/
+web-app/dist/
+web-app/dist-ssr/
+*.local
+.DS_Store
+
 # C extensions
 *.so
 
-# Distribution / packaging
+# Distribution / packaging (root-scoped so web-app/src/lib is not ignored)
 .Python
-build/
+/build/
 develop-eggs/
-dist/
+/dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/

@@ -1,49 +1,33 @@
 # Terminal Games Web App
 
-A professional, modern web application featuring a collection of classic games, ported from Python to React + TypeScript.
+React + TypeScript port of the Terminal Games collection.
 
-## 🎮 Games Included
+## Games
 
-1.  **Guess the Number:** Test your intuition by guessing numbers in various difficulty ranges.
-2.  **Roll the Dice:** A simulator for rolling 1-3 dice against a secret roll.
-3.  **Hangman:** The classic word-guessing game with a visual stick figure.
-4.  **Mastermind:** Crack the 4-digit code using logic and deduction.
-5.  **Minesweeper:** Clear the grid without detonating mines. Features flood-fill!
-6.  **Rock, Paper, Scissors:** Battle against the computer in this timeless hand game.
-7.  **Battleship:** Sink the enemy fleet before running out of hits.
+1. **Guess the Number** — difficulty ranges 1–50 / 1–100 / 1–200  
+2. **Roll the Dice** — match the secret sum with 1–3 dice  
+3. **Hangman** — on-screen keyboard + physical keyboard  
+4. **Mastermind** — 4-digit code, exact/partial feedback  
+5. **Minesweeper** — first-click safe, flood-fill, flags  
+6. **Rock, Paper, Scissors** — first to 3 with a 2-point lead  
+7. **Battleship** — place fleet, sink the computer  
 
-## 🚀 Tech Stack
+## Stack
 
--   **Frontend:** React, TypeScript, Vite
--   **Styling:** Tailwind CSS (v4), Glassmorphism UI
--   **Icons:** Lucide React
--   **Animations:** Framer Motion
+- React 19, TypeScript, Vite  
+- Tailwind CSS v4, Framer Motion, Lucide  
+- Pure logic under `src/lib/` (unit-tested with Vitest)
 
-## 🛠️ Installation
+## Commands
 
-1.  Navigate to the `web-app` directory:
-    ```bash
-    cd web-app
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-3.  Start the development server:
-    ```bash
-    npm run dev
-    ```
+```bash
+npm install
+npm run dev
+npm test
+npm run lint
+npm run build
+```
 
-## 📦 Deployment
+## Deployment
 
-This project is configured for deployment on GitHub Pages.
-
-1.  Run the build command:
-    ```bash
-    npm run build
-    ```
-2.  Deploy using GitHub Actions (workflow provided in `.github/workflows/deploy.yml`).
-
-## 📄 License
-
-MIT License. See [LICENSE](../LICENSE) for details.
+Configured for GitHub Pages (`base: /Terminal_Games/`). CI runs lint, tests, and build before deploy. See root README for client-side game caveats.

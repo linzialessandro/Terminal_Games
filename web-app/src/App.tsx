@@ -8,12 +8,11 @@ import Mastermind from './games/Mastermind';
 import Minesweeper from './games/Minesweeper';
 import RockPaperScissors from './games/RockPaperScissors';
 import Battleship from './games/Battleship';
-
-// All games implemented
+import { routerBasename } from './lib/routerBase';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={routerBasename()}>
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />

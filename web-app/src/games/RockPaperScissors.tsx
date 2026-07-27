@@ -3,16 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import GameRulesModal from '../components/GameRulesModal';
 import { ArrowLeft, Scissors, Hand, Scroll, RefreshCw, Trophy, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-type Choice = 'rock' | 'paper' | 'scissors';
-type GameResult = 'win' | 'lose' | 'draw' | null;
+import { type Choice, type RoundResult, roundResult, matchWinner as computeMatchWinner } from '../lib/rps';
 
 const RockPaperScissors: React.FC = () => {
     const [userScore, setUserScore] = useState(0);
     const [computerScore, setComputerScore] = useState(0);
     const [userChoice, setUserChoice] = useState<Choice | null>(null);
     const [computerChoice, setComputerChoice] = useState<Choice | null>(null);
-    const [result, setResult] = useState<GameResult>(null);
+    const [result, setResult] = useState<RoundResult | null>(null);
     const [isAnimating, setIsAnimating] = useState(false);
     const [matchWinner, setMatchWinner] = useState<'user' | 'computer' | null>(null);
     const [showRules, setShowRules] = useState(false);
@@ -31,39 +29,24 @@ const RockPaperScissors: React.FC = () => {
         setResult(null);
         setComputerChoice(null);
 
-        // Simulate computer thinking/animation
         setTimeout(() => {
             const randomChoice = choices[Math.floor(Math.random() * choices.length)].id;
             setComputerChoice(randomChoice);
             setIsAnimating(false);
 
-            if (choice === randomChoice) {
-                setResult('draw');
-            } else if (
-                (choice === 'rock' && randomChoice === 'scissors') ||
-                (choice === 'scissors' && randomChoice === 'paper') ||
-                (choice === 'paper' && randomChoice === 'rock')
-            ) {
-                setResult('win');
+            const outcome = roundResult(choice, randomChoice);
+            setResult(outcome);
+
+            if (outcome === 'win') {
                 const newScore = userScore + 1;
                 setUserScore(newScore);
-                checkMatchWinner(newScore, computerScore);
-            } else {
-                setResult('lose');
+                setMatchWinner(computeMatchWinner(newScore, computerScore));
+            } else if (outcome === 'lose') {
                 const newScore = computerScore + 1;
                 setComputerScore(newScore);
-                checkMatchWinner(userScore, newScore);
+                setMatchWinner(computeMatchWinner(userScore, newScore));
             }
-        }, 1000); // 1 second delay for tension
-    };
-
-    const checkMatchWinner = (uScore: number, cScore: number) => {
-        // Win condition: Score >= 3 AND Score >= Other + 2
-        if (uScore >= 3 && uScore >= cScore + 2) {
-            setMatchWinner('user');
-        } else if (cScore >= 3 && cScore >= uScore + 2) {
-            setMatchWinner('computer');
-        }
+        }, 1000);
     };
 
     const resetMatch = () => {

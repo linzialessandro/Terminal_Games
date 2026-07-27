@@ -170,7 +170,7 @@ const RollTheDice: React.FC = () => {
 
                 {/* Message */}
                 <div className="h-8">
-                    <p className={`text-lg font-medium ${message.includes('Congrats') ? 'text-green-400' : 'text-white/70'}`}>
+                    <p className={`text-lg font-medium ${message.includes('Congratulations') ? 'text-green-400' : 'text-white/70'}`} role="status">
                         {message}
                     </p>
                 </div>

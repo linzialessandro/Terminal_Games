@@ -3,6 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -20,7 +22,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -32,16 +34,39 @@ jobs:
         run: npm ci
         working-directory: web-app
 
+      - name: Lint
+        run: npm run lint
+        working-directory: web-app
+
+      - name: Unit tests
+        run: npm test
+        working-directory: web-app
+
       - name: Build
         run: npm run build
         working-directory: web-app
 
+      - name: Verify SPA fallback artifact
+        run: test -f dist/404.html && test -f dist/index.html
+        working-directory: web-app
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Python unit tests
+        run: python -m unittest test_logic.py -v
+        working-directory: terminal-games
+
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: web-app/dist
 
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

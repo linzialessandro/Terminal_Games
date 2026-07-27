@@ -1,69 +1,77 @@
 # Terminal Games Collection
 
-Welcome to the Terminal Games Collection! This repository hosts two versions of classic games: a Python-based terminal version and a modern web application.
+Classic games in two flavors: a Python terminal suite and a modern React web app.
 
-## 🌟 Play Online
+## Play Online
 
-Experience the **React + TypeScript** web version directly in your browser with enhanced graphics and animations:
-
-👉 **[Play Terminal Games Web App](https://linzialessandro.github.io/Terminal_Games/)**
+**[Play the web app on GitHub Pages](https://linzialessandro.github.io/Terminal_Games/)**
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
--   **`web-app/`**: A modern React application featuring Glassmorphism UI, animations, and responsive design.
--   **`terminal-games/`**: The original Python scripts for playing text-based games in your command line.
+| Path | Description |
+|------|-------------|
+| `web-app/` | React + TypeScript + Vite UI (glassmorphism, Framer Motion) |
+| `terminal-games/` | Python CLI menu (`game.py`) + pure logic (`logic.py`) |
+| `.github/workflows/deploy.yml` | Lint, unit tests, build, deploy to GitHub Pages |
 
----
+### Games
 
-## 🖥️ Terminal Version (Python)
-
-Classic text-based games for the command line enthusiast.
-
-### Games Included
--   Guess the Number
--   Roll the Dice
--   Hangman
--   Mastermind
--   Minesweeper
--   Rock, Paper, Scissors
--   Battleship
-
-### How to Run
-1.  Navigate to the `terminal-games` directory:
-    ```bash
-    cd terminal-games
-    ```
-2.  Run the game script:
-    ```bash
-    python game.py
-    ```
+Guess the Number · Roll the Dice · Hangman · Mastermind · Minesweeper · Rock Paper Scissors · Battleship
 
 ---
 
-## 🌐 Web Version (React)
+## Web Version
 
-A professional port of the games using modern web technologies.
+### Local development
 
-### Features
--   **Rich Aesthetics**: Dark mode, glassmorphism, and neon accents.
--   **Visual Gameplay**: Interactive boards for Battleship, Minesweeper, and more.
--   **Responsive**: Playable on desktop and mobile.
+```bash
+cd web-app
+npm install
+npm run dev
+```
 
-### Local Development
-1.  Navigate to the `web-app` directory:
-    ```bash
-    cd web-app
-    ```
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-3.  Start the dev server:
-    ```bash
-    npm run dev
-    ```
+### Scripts
 
-## 📄 License
-MIT License.
+| Command | Purpose |
+|---------|---------|
+| `npm run dev` | Dev server |
+| `npm run build` | Production build (`dist/` + SPA `404.html` fallback) |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest unit tests for game logic |
+| `npm run preview` | Preview production build |
+
+### Deployment notes
+
+- Vite `base` is `/Terminal_Games/` (repository name).
+- React Router uses the same basename so routes work under GitHub Pages.
+- Build copies `index.html` → `404.html` so deep links (e.g. `/minesweeper`) load the SPA.
+
+### Client-side games (important)
+
+All web games run entirely in the browser. Secret numbers, codes, mine maps, and ship positions live in React state and can be inspected with developer tools. That is expected for a casual single-player collection — not a competitive multiplayer product. Fairness is “for fun,” not cryptographic.
+
+---
+
+## Terminal Version (Python)
+
+```bash
+cd terminal-games
+python game.py
+```
+
+### Tests
+
+```bash
+cd terminal-games
+python -m unittest test_logic.py -v
+```
+
+Pure helpers live in `logic.py` (Mastermind scoring, ship tokens, flood-fill, RPS). The CLI imports them so behavior matches the tests.
+
+---
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
