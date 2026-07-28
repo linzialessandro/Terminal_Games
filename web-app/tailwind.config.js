@@ -6,6 +6,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
+        display: ['Orbitron', '"Plus Jakarta Sans"', "sans-serif"],
+        mono: ['"JetBrains Mono"', "ui-monospace", "monospace"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -43,8 +48,15 @@ export default {
       },
       borderRadius: {
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "calc(var(--radius) - 4px)",
+        sm: "calc(var(--radius) - 8px)",
+      },
+      transitionTimingFunction: {
+        cinema: "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
+      boxShadow: {
+        glow: "0 0 32px -6px var(--glow-primary)",
+        "glow-sm": "0 0 20px -8px var(--glow-primary)",
       },
     },
   },

@@ -1,8 +1,8 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GameRulesModal from '../components/GameRulesModal';
-import { ArrowLeft, RefreshCw, KeyRound, CheckCircle2, Circle, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import GameHeader from '../components/GameHeader';
+import { RefreshCw, KeyRound, CheckCircle2, Circle } from 'lucide-react';
 import { generateCode, scoreGuess } from '../lib/mastermind';
 
 const Mastermind: React.FC = () => {
@@ -52,34 +52,20 @@ const Mastermind: React.FC = () => {
     };
 
     const rules = [
-        "A 4-digit secret code (0-9) is generated.",
-        "Your goal is to guess the code within 10 attempts.",
-        "Green Check: Correct number in the correct position.",
-        "White Circle: Correct number but wrong position.",
-        "Use logic to deduce the code!"
+        'A 4-digit secret code (0-9) is generated.',
+        'Your goal is to guess the code within 10 attempts.',
+        'Green check: correct number in the correct position.',
+        'White circle: correct number but wrong position.',
+        'Use logic to deduce the code!',
     ];
 
     return (
-        <div className="flex flex-col items-center w-full max-w-2xl mx-auto h-full overflow-hidden">
-            <div className="flex items-center justify-between w-full mb-6">
-                <Link
-                    to="/"
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
-                    aria-label="Back to home"
-                >
-                    <ArrowLeft className="w-6 h-6" />
-                </Link>
-                <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-orange-500">
-                    Mastermind
-                </h2>
-                <button
-                    onClick={() => setShowRules(true)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-yellow-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
-                    aria-label="Show rules"
-                >
-                    <Info className="w-6 h-6" />
-                </button>
-            </div>
+        <div className="mx-auto flex h-full w-full max-w-2xl flex-col overflow-hidden">
+            <GameHeader
+                title="Mastermind"
+                accentClassName="from-amber-400 to-orange-500"
+                onShowRules={() => setShowRules(true)}
+            />
 
             <GameRulesModal
                 isOpen={showRules}
@@ -89,97 +75,122 @@ const Mastermind: React.FC = () => {
                 rules={rules}
             />
 
-            <div className="glass-panel w-full flex-1 flex flex-col p-6 rounded-2xl overflow-hidden">
-
-                <div className="flex justify-between items-center mb-6 bg-white/5 p-4 rounded-xl">
+            <div className="glass-panel flex w-full flex-1 flex-col overflow-hidden rounded-2xl p-5 sm:p-6">
+                <div className="mb-6 flex items-center justify-between rounded-xl surface-inset p-4">
                     <div className="flex flex-col">
-                        <span className="text-sm text-white/50 uppercase">Attempts Left</span>
-                        <span className={`text-2xl font-mono font-bold ${attempts < 4 ? 'text-red-400' : 'text-yellow-400'}`}>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Attempts left
+                        </span>
+                        <span
+                            className={`font-mono text-2xl font-bold ${
+                                attempts < 4 ? 'text-rose-400' : 'text-amber-400'
+                            }`}
+                        >
                             {attempts}
                         </span>
                     </div>
                     <div className="flex flex-col items-end">
-                        <span className="text-sm text-white/50 uppercase">Status</span>
-                        <span className={`text-lg font-bold ${gameState === 'playing' ? 'text-white' :
-                            gameState === 'won' ? 'text-green-400' : 'text-red-400'
-                            }`}>
-                            {gameState === 'playing' ? 'Crack the Code' : gameState === 'won' ? 'UNLOCKED!' : 'FAILED'}
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Status
+                        </span>
+                        <span
+                            className={`text-base font-bold ${
+                                gameState === 'playing'
+                                    ? 'text-foreground'
+                                    : gameState === 'won'
+                                      ? 'text-emerald-400'
+                                      : 'text-rose-400'
+                            }`}
+                        >
+                            {gameState === 'playing' ? 'Crack the code' : gameState === 'won' ? 'Unlocked!' : 'Failed'}
                         </span>
                     </div>
                 </div>
 
-                <div className="flex justify-center mb-6 gap-4" aria-label="Secret code">
+                <div className="mb-6 flex justify-center gap-3" aria-label="Secret code">
                     {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="w-12 h-16 bg-black/40 border border-white/10 rounded-lg flex items-center justify-center text-3xl font-mono font-bold text-yellow-500">
+                        <div
+                            key={i}
+                            className="flex h-16 w-12 items-center justify-center rounded-xl surface-inset font-mono text-3xl font-bold text-amber-400"
+                        >
                             {gameState !== 'playing' ? secretCode[i] : '?'}
                         </div>
                     ))}
                 </div>
 
                 {gameState === 'playing' ? (
-                    <form onSubmit={handleGuess} className="flex gap-4 mb-6">
+                    <form onSubmit={handleGuess} className="mb-6 flex gap-3">
                         <div className="relative flex-1">
-                            <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" aria-hidden />
+                            <KeyRound
+                                className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/60"
+                                aria-hidden
+                            />
                             <input
                                 type="text"
                                 inputMode="numeric"
                                 value={guess}
                                 onChange={handleInputChange}
-                                placeholder="Enter 4 digits (0-9)"
+                                placeholder="4 digits (0–9)"
                                 aria-label="Four digit guess"
-                                className="w-full bg-black/30 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-xl font-mono tracking-widest focus:outline-none focus:border-yellow-500/50 focus-visible:ring-2 focus-visible:ring-yellow-400 transition-colors"
+                                className="w-full rounded-xl surface-inset py-4 pl-12 pr-4 font-mono text-xl tracking-widest text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                                 autoFocus
                             />
                         </div>
                         <button
                             type="submit"
                             disabled={guess.length !== 4}
-                            className="bg-yellow-600 hover:bg-yellow-500 text-black font-bold px-8 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300"
+                            className="btn-primary rounded-xl px-6 font-bold disabled:opacity-50 sm:px-8"
                         >
-                            GUESS
+                            Guess
                         </button>
                     </form>
                 ) : (
                     <button
+                        type="button"
                         onClick={startNewGame}
-                        className="glass-button w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+                        className="glass-button mb-6 flex w-full items-center justify-center gap-2 rounded-xl py-3.5 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
                     >
-                        <RefreshCw /> Play Again
+                        <RefreshCw size={18} aria-hidden /> Play Again
                     </button>
                 )}
 
-                <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/10">
+                <div className="flex-1 overflow-y-auto pr-1">
                     <AnimatePresence>
                         {history.map((record) => (
                             <motion.div
                                 key={record.id}
-                                initial={{ opacity: 0, y: -20 }}
+                                initial={{ opacity: 0, y: -12 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="flex justify-between items-center bg-white/5 p-4 rounded-xl mb-2 border border-white/5"
+                                className="mb-2 flex items-center justify-between rounded-xl surface-inset p-4"
                             >
-                                <div className="font-mono text-2xl tracking-[0.5em] text-white/90">
+                                <div className="font-mono text-2xl tracking-[0.4em] text-foreground/90">
                                     {record.guess}
                                 </div>
                                 <div className="flex gap-4 text-sm">
-                                    <div className="flex items-center gap-1 text-green-400" title="Correct Number & Position">
-                                        <CheckCircle2 size={16} />
-                                        <span className="font-bold">{record.exact}</span>
+                                    <div
+                                        className="flex items-center gap-1 text-emerald-400"
+                                        title="Correct number & position"
+                                    >
+                                        <CheckCircle2 size={16} aria-hidden />
+                                        <span className="font-bold font-mono">{record.exact}</span>
                                     </div>
-                                    <div className="flex items-center gap-1 text-white/50" title="Correct Number, Wrong Position">
-                                        <Circle size={16} />
-                                        <span className="font-bold">{record.partial}</span>
+                                    <div
+                                        className="flex items-center gap-1 text-muted-foreground"
+                                        title="Correct number, wrong position"
+                                    >
+                                        <Circle size={16} aria-hidden />
+                                        <span className="font-bold font-mono">{record.partial}</span>
                                     </div>
                                 </div>
                             </motion.div>
                         ))}
                     </AnimatePresence>
                     {history.length === 0 && (
-                        <div className="text-center text-white/20 mt-10 italic">
-                            Attempts will appear here...
+                        <div className="mt-10 text-center text-sm italic text-muted-foreground/50">
+                            Attempts will appear here…
                         </div>
                     )}
                 </div>
-
             </div>
         </div>
     );

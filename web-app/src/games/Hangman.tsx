@@ -1,35 +1,62 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import GameRulesModal from '../components/GameRulesModal';
-import { ArrowLeft, RefreshCw, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import GameHeader from '../components/GameHeader';
+import { RefreshCw } from 'lucide-react';
 import { applyGuess } from '../lib/hangman';
 
 const HangmanDrawing = ({ attempts }: { attempts: number }) => {
     return (
-        <div className="relative w-64 h-64 flex justify-center bg-white/5 rounded-xl border border-white/10" aria-hidden>
-            <div className="absolute bottom-4 w-48 h-2 bg-white/30" />
-            <div className="absolute bottom-4 left-1/2 -translate-x-12 w-2 h-56 bg-white/30" />
-            <div className="absolute top-8 left-1/2 -translate-x-12 w-32 h-2 bg-white/30" />
-            <div className="absolute top-8 right-12 w-2 h-8 bg-white/30" />
+        <div
+            className="relative flex h-64 w-64 justify-center rounded-2xl surface-inset"
+            aria-hidden
+        >
+            <div className="absolute bottom-4 h-2 w-48 bg-white/30" />
+            <div className="absolute bottom-4 left-1/2 h-56 w-2 -translate-x-12 bg-white/30" />
+            <div className="absolute top-8 left-1/2 h-2 w-32 -translate-x-12 bg-white/30" />
+            <div className="absolute top-8 right-12 h-8 w-2 bg-white/30" />
 
             {attempts < 6 && (
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-16 right-[38px] w-10 h-10 rounded-full border-4 border-white" />
+                <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-16 right-[38px] h-10 w-10 rounded-full border-4 border-white"
+                />
             )}
             {attempts < 5 && (
-                <motion.div initial={{ height: 0 }} animate={{ height: 64 }} className="absolute top-24 right-[54px] w-1 h-16 bg-white" />
+                <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: 64 }}
+                    className="absolute top-24 right-[54px] h-16 w-1 bg-white"
+                />
             )}
             {attempts < 4 && (
-                <motion.div initial={{ rotate: -45, scale: 0 }} animate={{ rotate: -45, scale: 1 }} className="absolute top-32 right-[60px] w-1 h-12 bg-white origin-top-left" />
+                <motion.div
+                    initial={{ rotate: -45, scale: 0 }}
+                    animate={{ rotate: -45, scale: 1 }}
+                    className="absolute top-32 right-[60px] h-12 w-1 origin-top-left bg-white"
+                />
             )}
             {attempts < 3 && (
-                <motion.div initial={{ rotate: 45, scale: 0 }} animate={{ rotate: 45, scale: 1 }} className="absolute top-32 right-[48px] w-1 h-12 bg-white origin-top-right" />
+                <motion.div
+                    initial={{ rotate: 45, scale: 0 }}
+                    animate={{ rotate: 45, scale: 1 }}
+                    className="absolute top-32 right-[48px] h-12 w-1 origin-top-right bg-white"
+                />
             )}
             {attempts < 2 && (
-                <motion.div initial={{ rotate: -45, scale: 0 }} animate={{ rotate: -45, scale: 1 }} className="absolute top-40 right-[60px] w-1 h-12 bg-white origin-top-left" />
+                <motion.div
+                    initial={{ rotate: -45, scale: 0 }}
+                    animate={{ rotate: -45, scale: 1 }}
+                    className="absolute top-40 right-[60px] h-12 w-1 origin-top-left bg-white"
+                />
             )}
             {attempts < 1 && (
-                <motion.div initial={{ rotate: 45, scale: 0 }} animate={{ rotate: 45, scale: 1 }} className="absolute top-40 right-[48px] w-1 h-12 bg-white origin-top-right" />
+                <motion.div
+                    initial={{ rotate: 45, scale: 0 }}
+                    animate={{ rotate: 45, scale: 1 }}
+                    className="absolute top-40 right-[48px] h-12 w-1 origin-top-right bg-white"
+                />
             )}
         </div>
     );
@@ -86,26 +113,12 @@ const Hangman: React.FC = () => {
     const keyboard = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
     return (
-        <div className="flex flex-col items-center w-full max-w-4xl mx-auto">
-            <div className="flex items-center justify-between w-full mb-8">
-                <Link
-                    to="/"
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
-                    aria-label="Back to home"
-                >
-                    <ArrowLeft className="w-6 h-6" />
-                </Link>
-                <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-cyan-500">
-                    Hangman
-                </h2>
-                <button
-                    onClick={() => setShowRules(true)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-green-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
-                    aria-label="Show rules"
-                >
-                    <Info className="w-6 h-6" />
-                </button>
-            </div>
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-center">
+            <GameHeader
+                title="Hangman"
+                accentClassName="from-emerald-400 to-cyan-500"
+                onShowRules={() => setShowRules(true)}
+            />
 
             <GameRulesModal
                 isOpen={showRules}
@@ -115,15 +128,24 @@ const Hangman: React.FC = () => {
                 rules={rules}
             />
 
-            <div className="flex flex-col md:flex-row w-full gap-8">
-                <div className="flex-1 glass-panel p-8 rounded-2xl flex flex-col items-center justify-center min-h-[400px]">
+            <div className="flex w-full flex-col gap-6 md:flex-row md:gap-8">
+                <div className="glass-panel flex min-h-[400px] flex-1 flex-col items-center justify-center rounded-2xl p-6 sm:p-8">
                     <HangmanDrawing attempts={attempts} />
 
-                    <div className="flex flex-wrap justify-center gap-2 mb-8 mt-8" aria-label="Word progress">
+                    <div className="mb-6 mt-8 flex flex-wrap justify-center gap-2" aria-label="Word progress">
                         {word.split('').map((char, i) => (
-                            <div key={i} className="w-10 h-12 border-b-2 border-white/50 flex items-center justify-center text-3xl font-mono uppercase">
+                            <div
+                                key={i}
+                                className="flex h-12 w-9 items-center justify-center border-b-2 border-white/40 font-mono text-2xl uppercase sm:w-10 sm:text-3xl"
+                            >
                                 {gameState === 'lost' || guessedLetters.has(char) ? (
-                                    <span className={gameState === 'lost' && !guessedLetters.has(char) ? 'text-red-400' : ''}>{char}</span>
+                                    <span
+                                        className={
+                                            gameState === 'lost' && !guessedLetters.has(char) ? 'text-rose-400' : ''
+                                        }
+                                    >
+                                        {char}
+                                    </span>
                                 ) : (
                                     ''
                                 )}
@@ -131,34 +153,53 @@ const Hangman: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="h-8 text-center bg-transparent" role="status">
-                        {gameState === 'won' && <p className="text-green-400 text-xl font-bold animate-pulse">You Won!</p>}
-                        {gameState === 'lost' && <p className="text-red-400 text-xl font-bold">Game Over! Word was: {word}</p>}
+                    <div className="h-8 text-center" role="status">
+                        {gameState === 'won' && (
+                            <p className="text-xl font-bold text-emerald-400">You won!</p>
+                        )}
+                        {gameState === 'lost' && (
+                            <p className="text-lg font-bold text-rose-400">
+                                Game over — word was: <span className="font-mono">{word}</span>
+                            </p>
+                        )}
                     </div>
                 </div>
 
-                <div className="flex-1 flex flex-col gap-6">
-                    <div className="glass-panel p-6 rounded-2xl">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-white/70 uppercase text-sm tracking-wider">Attempts Left</h3>
-                            <span className={`text-2xl font-bold ${attempts < 3 ? 'text-red-400' : 'text-green-400'}`}>{attempts}</span>
+                <div className="flex flex-1 flex-col gap-4">
+                    <div className="glass-panel rounded-2xl p-5 sm:p-6">
+                        <div className="mb-4 flex items-center justify-between">
+                            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Attempts left
+                            </h3>
+                            <span
+                                className={`font-mono text-2xl font-bold ${
+                                    attempts < 3 ? 'text-rose-400' : 'text-emerald-400'
+                                }`}
+                            >
+                                {attempts}
+                            </span>
                         </div>
                         <button
+                            type="button"
                             onClick={startNewGame}
-                            className="glass-button w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
+                            className="glass-button flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
                         >
-                            <RefreshCw size={20} />
+                            <RefreshCw size={18} aria-hidden />
                             New Game
                         </button>
                     </div>
 
-                    <div className="glass-panel p-6 rounded-2xl flex flex-wrap gap-2 justify-center" role="group" aria-label="Letter keyboard">
+                    <div
+                        className="glass-panel flex flex-wrap justify-center gap-2 rounded-2xl p-5 sm:p-6"
+                        role="group"
+                        aria-label="Letter keyboard"
+                    >
                         {keyboard.map((char) => {
                             const status = guessedLetters.has(char)
                                 ? word.includes(char)
-                                    ? 'bg-green-500/20 text-green-400 border-green-500/50'
-                                    : 'bg-white/5 text-white/20 border-transparent'
-                                : 'hover:bg-white/10 border-white/10 cursor-pointer';
+                                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                                    : 'bg-white/5 text-white/25 border-transparent'
+                                : 'hover:bg-white/10 border-white/10 cursor-pointer text-foreground';
 
                             return (
                                 <button
@@ -166,7 +207,7 @@ const Hangman: React.FC = () => {
                                     type="button"
                                     onClick={() => handleGuess(char)}
                                     disabled={guessedLetters.has(char) || gameState !== 'playing'}
-                                    className={`w-10 h-10 rounded-lg border font-mono text-lg uppercase transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400 ${status}`}
+                                    className={`h-11 w-10 rounded-lg border font-mono text-base uppercase transition-all duration-200 ease-cinema focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:cursor-not-allowed sm:h-10 sm:w-10 ${status}`}
                                     aria-label={`Guess letter ${char}`}
                                 >
                                     {char}

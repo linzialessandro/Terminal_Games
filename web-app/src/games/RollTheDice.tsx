@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import GameRulesModal from '../components/GameRulesModal';
-import { ArrowLeft, Dices, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import GameHeader from '../components/GameHeader';
+import { Dices, Dice1, Dice2, Dice3, Dice4, Dice5, Dice6 } from 'lucide-react';
 
 const DiceIcon = ({ value, className }: { value: number; className?: string }) => {
     const icons = [Dice1, Dice2, Dice3, Dice4, Dice5, Dice6];
@@ -20,9 +20,8 @@ const RollTheDice: React.FC = () => {
 
     const roll = () => {
         setGameState('rolling');
-        setMessage('Rolling...');
+        setMessage('Rolling…');
 
-        // Animation delay
         setTimeout(() => {
             const newSecretRolls = Array.from({ length: numDice }, () => Math.floor(Math.random() * 6) + 1);
             const newUserRolls = Array.from({ length: numDice }, () => Math.floor(Math.random() * 6) + 1);
@@ -37,7 +36,7 @@ const RollTheDice: React.FC = () => {
             if (userSum === secretSum) {
                 setMessage('Congratulations! You matched the secret roll!');
             } else {
-                setMessage('You didn\'t match. Try again!');
+                setMessage("You didn't match. Try again!");
             }
         }, 1000);
     };
@@ -50,28 +49,19 @@ const RollTheDice: React.FC = () => {
     };
 
     const rules = [
-        "Choose the number of dice you want to roll (1, 2, or 3).",
+        'Choose the number of dice you want to roll (1, 2, or 3).',
         "Click 'Roll Dice' to roll your dice and the secret dice simultaneously.",
-        "The goal is to match the sum of your dice with the sum of the secret dice.",
-        "It's purely a game of luck. Good luck!"
+        'The goal is to match the sum of your dice with the sum of the secret dice.',
+        "It's purely a game of luck. Good luck!",
     ];
 
     return (
-        <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
-            <div className="flex items-center justify-between w-full mb-8">
-                <Link to="/" className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                    <ArrowLeft className="w-6 h-6" />
-                </Link>
-                <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-500">
-                    Roll the Dice
-                </h2>
-                <button
-                    onClick={() => setShowRules(true)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-pink-300"
-                >
-                    <Info className="w-6 h-6" />
-                </button>
-            </div>
+        <div className="mx-auto flex w-full max-w-2xl flex-col items-center">
+            <GameHeader
+                title="Roll the Dice"
+                accentClassName="from-violet-400 to-pink-500"
+                onShowRules={() => setShowRules(true)}
+            />
 
             <GameRulesModal
                 isOpen={showRules}
@@ -81,18 +71,26 @@ const RollTheDice: React.FC = () => {
                 rules={rules}
             />
 
-            <div className="glass-panel p-6 rounded-2xl w-full flex flex-col items-center gap-6">
-
-                {/* Configuration */}
+            <div className="glass-panel flex w-full flex-col items-center gap-6 rounded-2xl p-6 sm:p-8">
                 <div className="flex flex-col items-center gap-2">
-                    <label className="text-white/70 text-sm uppercase tracking-wider">Number of Dice</label>
-                    <div className="flex bg-black/30 p-1 rounded-lg">
-                        {[1, 2, 3].map(n => (
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Number of dice
+                    </span>
+                    <div className="flex rounded-xl surface-inset p-1" role="group" aria-label="Dice count">
+                        {[1, 2, 3].map((n) => (
                             <button
                                 key={n}
-                                onClick={() => { setNumDice(n); reset(); }}
-                                className={`px-4 py-2 rounded-md transition-all ${numDice === n ? 'bg-purple-600 text-white shadow-lg' : 'hover:bg-white/5 text-white/50'}`}
+                                type="button"
+                                onClick={() => {
+                                    setNumDice(n);
+                                    reset();
+                                }}
                                 disabled={gameState === 'rolling'}
+                                className={`min-h-11 min-w-11 cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200 ease-cinema disabled:cursor-not-allowed disabled:opacity-50 ${
+                                    numDice === n
+                                        ? 'bg-primary text-primary-foreground shadow-glow-sm'
+                                        : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+                                }`}
                             >
                                 {n}
                             </button>
@@ -100,16 +98,13 @@ const RollTheDice: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Game Area */}
-                <div className="w-full flex justify-around items-center min-h-[200px] py-8">
-
-                    {/* User Rolls */}
+                <div className="flex w-full min-h-[200px] items-center justify-around gap-4 py-6">
                     <div className="flex flex-col items-center gap-4">
-                        <h3 className="text-xl font-bold text-purple-300">Your Roll</h3>
+                        <h3 className="text-sm font-semibold uppercase tracking-wider text-violet-300">Your roll</h3>
                         <div className="flex gap-2">
                             {gameState === 'idle' ? (
                                 Array.from({ length: numDice }).map((_, i) => (
-                                    <Dices key={i} size={48} className="text-white/20" />
+                                    <Dices key={i} size={48} className="text-white/20" aria-hidden />
                                 ))
                             ) : (
                                 userRolls.map((val, i) => (
@@ -117,73 +112,78 @@ const RollTheDice: React.FC = () => {
                                         key={i}
                                         initial={{ rotate: 180, scale: 0.5 }}
                                         animate={{ rotate: 0, scale: 1 }}
-                                        transition={{ type: "spring", bounce: 0.5 }}
+                                        transition={{ type: 'spring', bounce: 0.45 }}
                                     >
-                                        <DiceIcon value={val} className="w-16 h-16 text-purple-400" />
+                                        <DiceIcon value={val} className="h-14 w-14 text-violet-400 sm:h-16 sm:w-16" />
                                     </motion.div>
                                 ))
                             )}
                         </div>
                         {gameState === 'revealed' && (
-                            <p className="text-2xl font-mono">{userRolls.reduce((a, b) => a + b, 0)}</p>
+                            <p className="font-mono text-2xl font-semibold">
+                                {userRolls.reduce((a, b) => a + b, 0)}
+                            </p>
                         )}
                     </div>
 
-                    <div className="h-32 w-px bg-white/10"></div>
+                    <div className="h-28 w-px bg-white/10" aria-hidden />
 
-                    {/* Secret Rolls */}
                     <div className="flex flex-col items-center gap-4">
-                        <h3 className="text-xl font-bold text-pink-300">Secret Roll</h3>
+                        <h3 className="text-sm font-semibold uppercase tracking-wider text-pink-300">Secret roll</h3>
                         <div className="flex gap-2">
                             {gameState === 'idle' ? (
                                 Array.from({ length: numDice }).map((_, i) => (
-                                    <Dices key={i} size={48} className="text-white/20" />
+                                    <Dices key={i} size={48} className="text-white/20" aria-hidden />
                                 ))
                             ) : gameState === 'rolling' ? (
                                 Array.from({ length: numDice }).map((_, i) => (
                                     <motion.div
                                         key={i}
                                         animate={{ rotate: 360 }}
-                                        transition={{ repeat: Infinity, duration: 0.5 }}
+                                        transition={{ repeat: Infinity, duration: 0.5, ease: 'linear' }}
                                     >
-                                        <Dices size={64} className="text-pink-400/50" />
+                                        <Dices size={56} className="text-pink-400/50" aria-hidden />
                                     </motion.div>
                                 ))
                             ) : (
                                 secretRolls.map((val, i) => (
                                     <motion.div
                                         key={i}
-                                        initial={{ opacity: 0, y: 20 }}
+                                        initial={{ opacity: 0, y: 16 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.2 }}
+                                        transition={{ delay: 0.15 }}
                                     >
-                                        <DiceIcon value={val} className="w-16 h-16 text-pink-400" />
+                                        <DiceIcon value={val} className="h-14 w-14 text-pink-400 sm:h-16 sm:w-16" />
                                     </motion.div>
                                 ))
                             )}
                         </div>
                         {gameState === 'revealed' && (
-                            <p className="text-2xl font-mono">{secretRolls.reduce((a, b) => a + b, 0)}</p>
+                            <p className="font-mono text-2xl font-semibold">
+                                {secretRolls.reduce((a, b) => a + b, 0)}
+                            </p>
                         )}
                     </div>
                 </div>
 
-                {/* Message */}
-                <div className="h-8">
-                    <p className={`text-lg font-medium ${message.includes('Congratulations') ? 'text-green-400' : 'text-white/70'}`} role="status">
+                <div className="min-h-8 text-center" role="status">
+                    <p
+                        className={`text-base font-medium ${
+                            message.includes('Congratulations') ? 'text-emerald-400' : 'text-muted-foreground'
+                        }`}
+                    >
                         {message}
                     </p>
                 </div>
 
-                {/* Controls */}
                 <button
+                    type="button"
                     onClick={roll}
                     disabled={gameState === 'rolling'}
-                    className="glass-button w-full max-w-sm py-4 rounded-xl text-xl font-bold hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-primary w-full max-w-sm rounded-xl py-3.5 text-base disabled:opacity-50"
                 >
                     {gameState === 'idle' ? 'Roll Dice' : 'Roll Again'}
                 </button>
-
             </div>
         </div>
     );

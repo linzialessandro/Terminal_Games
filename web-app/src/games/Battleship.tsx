@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import GameRulesModal from '../components/GameRulesModal';
-import { ArrowLeft, RefreshCw, Crosshair, Anchor, RotateCcw, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import GameHeader from '../components/GameHeader';
+import { RefreshCw, Crosshair, Anchor, RotateCcw } from 'lucide-react';
 import {
     type CellState,
     type ShipData,
@@ -51,7 +51,6 @@ const BattleshipComponent = () => {
     const [showRules, setShowRules] = useState(false);
 
     const [userBoard, setUserBoard] = useState(() => createEmptyBoard(BOARD_SIZE));
-    // Seed computer fleet once on mount (paired board + ships); reset via startNewGame.
     const [initialComputer] = useState(generateComputerFleet);
     const [computerBoard, setComputerBoard] = useState(initialComputer.board);
     const [userShips, setUserShips] = useState<Record<string, ShipData>>({});
@@ -179,7 +178,7 @@ const BattleshipComponent = () => {
             );
         } else {
             setGameState('playing');
-            setMessage('Game Start! Fire at enemy waters!');
+            setMessage('Game start! Fire at enemy waters!');
         }
     };
 
@@ -221,12 +220,12 @@ const BattleshipComponent = () => {
         onClick: (r: number, c: number) => void,
         onHover?: (r: number, c: number) => void
     ) => (
-        <div className="relative bg-blue-900/30 p-2 sm:p-4 rounded-xl border border-blue-500/30 select-none">
-            <div className="absolute top-2 left-2 text-xs font-bold text-white/30 uppercase tracking-widest">
-                {isEnemy ? 'Enemy Waters' : 'Friendly Waters'}
+        <div className="relative select-none rounded-2xl border border-cyan-500/25 bg-cyan-950/30 p-2 sm:p-4">
+            <div className="absolute left-3 top-2 text-[10px] font-bold uppercase tracking-widest text-cyan-200/40">
+                {isEnemy ? 'Enemy waters' : 'Friendly waters'}
             </div>
             <div
-                className="grid grid-cols-10 border-t border-l border-blue-500/30 mt-6 select-none bg-blue-900/40"
+                className="mt-5 grid grid-cols-10 border-l border-t border-cyan-500/25 bg-cyan-950/40 select-none"
                 onMouseLeave={() => setHoverCoords([])}
                 role="grid"
                 aria-label={isEnemy ? 'Enemy board' : 'Your board'}
@@ -250,16 +249,16 @@ const BattleshipComponent = () => {
                                 }}
                                 onMouseEnter={() => onHover && onHover(r, c)}
                                 className={`
-                                    w-8 h-8 sm:w-10 sm:h-10 relative transition-all duration-200 border-b border-r border-blue-500/30 flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400
-                                    ${isHovered ? (canPlaceShip(userBoard, hoverCoords, BOARD_SIZE) ? 'bg-green-500/40' : 'bg-red-500/40') : ''}
-                                    ${cell === 'hit' ? 'bg-red-500/30' : cell === 'miss' ? 'bg-white/5' : ''}
-                                    ${showShip ? 'bg-gray-500/50' : ''}
-                                    ${!isEnemy && !isHovered && cell === 'empty' ? 'hover:bg-blue-500/20' : ''}
-                                    ${isEnemy && gameState === 'playing' && turn === 'user' && cell !== 'hit' && cell !== 'miss' ? 'cursor-pointer hover:bg-red-500/20' : ''}
+                                    relative flex h-8 w-8 items-center justify-center border-b border-r border-cyan-500/25 transition-all duration-200 ease-cinema focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 sm:h-10 sm:w-10
+                                    ${isHovered ? (canPlaceShip(userBoard, hoverCoords, BOARD_SIZE) ? 'bg-emerald-500/40' : 'bg-rose-500/40') : ''}
+                                    ${cell === 'hit' ? 'bg-rose-500/35' : cell === 'miss' ? 'bg-white/5' : ''}
+                                    ${showShip ? 'bg-slate-500/45' : ''}
+                                    ${!isEnemy && !isHovered && cell === 'empty' ? 'hover:bg-cyan-500/20' : ''}
+                                    ${isEnemy && gameState === 'playing' && turn === 'user' && cell !== 'hit' && cell !== 'miss' ? 'cursor-pointer hover:bg-rose-500/25' : ''}
                                 `}
                             >
-                                {cell === 'hit' && <Crosshair size={20} className="text-red-500 animate-pulse" />}
-                                {cell === 'miss' && <div className="w-2 h-2 rounded-full bg-white/30" />}
+                                {cell === 'hit' && <Crosshair size={18} className="text-rose-400" aria-hidden />}
+                                {cell === 'miss' && <div className="h-2 w-2 rounded-full bg-white/35" />}
                                 {showShip && <div className="absolute inset-1 border border-white/20" />}
                             </div>
                         );
@@ -277,26 +276,12 @@ const BattleshipComponent = () => {
     ];
 
     return (
-        <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4 pb-20">
-            <div className="flex items-center justify-between w-full mb-6">
-                <Link
-                    to="/"
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                    aria-label="Back to home"
-                >
-                    <ArrowLeft className="w-6 h-6" />
-                </Link>
-                <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">
-                    Battleship
-                </h2>
-                <button
-                    onClick={() => setShowRules(true)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-cyan-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                    aria-label="Show rules"
-                >
-                    <Info className="w-6 h-6" />
-                </button>
-            </div>
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-center pb-8">
+            <GameHeader
+                title="Battleship"
+                accentClassName="from-cyan-400 to-blue-500"
+                onShowRules={() => setShowRules(true)}
+            />
 
             <GameRulesModal
                 isOpen={showRules}
@@ -306,48 +291,62 @@ const BattleshipComponent = () => {
                 rules={rules}
             />
 
-            <div className="glass-panel w-full max-w-3xl p-4 mb-8 text-center rounded-xl bg-blue-900/20 border-blue-500/30">
+            <div className="glass-panel mb-8 w-full max-w-3xl rounded-2xl border-cyan-500/20 bg-cyan-950/20 p-4 text-center sm:p-5">
                 <span
-                    className={`text-xl font-bold tracking-wide ${gameState === 'won' ? 'text-green-400' : gameState === 'lost' ? 'text-red-400' : 'text-blue-100'}`}
+                    className={`text-lg font-semibold tracking-wide sm:text-xl ${
+                        gameState === 'won'
+                            ? 'text-emerald-400'
+                            : gameState === 'lost'
+                              ? 'text-rose-400'
+                              : 'text-cyan-50'
+                    }`}
                     role="status"
                 >
                     {message}
                 </span>
                 {gameState === 'setup' && (
-                    <div className="mt-4 flex justify-center gap-4">
+                    <div className="mt-4 flex justify-center">
                         <button
                             type="button"
                             onClick={() => setIsHorizontal(!isHorizontal)}
-                            className="glass-button px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            className="glass-button flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                         >
-                            <RotateCcw size={16} /> Rotate: {isHorizontal ? 'Horizontal' : 'Vertical'}
+                            <RotateCcw size={16} aria-hidden /> Rotate:{' '}
+                            {isHorizontal ? 'Horizontal' : 'Vertical'}
                         </button>
                     </div>
                 )}
             </div>
 
-            <div className="flex flex-col xl:flex-row gap-8 lg:gap-16 items-start justify-center w-full max-w-7xl">
-                <div className="flex flex-col gap-12 w-full max-w-2xl mx-auto">
+            <div className="flex w-full max-w-7xl flex-col items-start justify-center gap-8 xl:flex-row xl:gap-12">
+                <div className="mx-auto flex w-full max-w-2xl flex-col gap-10">
                     <div className={gameState === 'setup' ? '' : 'order-2'}>
-                        {renderGrid(userBoard, false, gameState === 'setup' ? handleSetupClick : () => {}, gameState === 'setup' ? handleSetupHover : undefined)}
-                        <div className="mt-2 text-center text-sm text-white/40">You</div>
+                        {renderGrid(
+                            userBoard,
+                            false,
+                            gameState === 'setup' ? handleSetupClick : () => {},
+                            gameState === 'setup' ? handleSetupHover : undefined
+                        )}
+                        <div className="mt-2 text-center text-sm text-muted-foreground">You</div>
                     </div>
 
                     {gameState !== 'setup' && (
                         <div className="order-1">
                             {renderGrid(computerBoard, true, (r, c) => handleUserFire(r, c))}
-                            <div className="mt-2 text-center text-sm text-white/40">Computer</div>
+                            <div className="mt-2 text-center text-sm text-muted-foreground">Computer</div>
                         </div>
                     )}
                 </div>
 
-                <div className="glass-panel p-6 rounded-xl min-w-[250px] w-full lg:w-auto">
-                    <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-blue-200">
-                        <Anchor size={20} /> Fleet Status
+                <div className="glass-panel w-full min-w-[250px] rounded-2xl p-6 lg:w-auto">
+                    <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-cyan-100">
+                        <Anchor size={18} aria-hidden /> Fleet status
                     </h3>
 
                     <div className="mb-6">
-                        <h4 className="text-xs uppercase text-white/40 mb-2 font-bold">Your Fleet</h4>
+                        <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                            Your fleet
+                        </h4>
                         <div className="flex flex-col gap-2">
                             {SHIP_CONFIG.map((ship) => {
                                 const isSunk = sunkUserShips.includes(ship.name);
@@ -355,14 +354,26 @@ const BattleshipComponent = () => {
                                 return (
                                     <div
                                         key={ship.name}
-                                        className={`flex items-center justify-between text-sm ${isSunk ? 'text-red-400 line-through' : isPlaced ? 'text-green-300' : 'text-white/30'}`}
+                                        className={`flex items-center justify-between text-sm ${
+                                            isSunk
+                                                ? 'text-rose-400 line-through'
+                                                : isPlaced
+                                                  ? 'text-emerald-300'
+                                                  : 'text-muted-foreground/50'
+                                        }`}
                                     >
                                         <span>{ship.name}</span>
                                         <div className="flex gap-1">
                                             {Array.from({ length: ship.length }).map((_, i) => (
                                                 <div
                                                     key={i}
-                                                    className={`w-1.5 h-1.5 rounded-full ${isSunk ? 'bg-red-400' : isPlaced ? 'bg-green-400' : 'bg-white/10'}`}
+                                                    className={`h-1.5 w-1.5 rounded-full ${
+                                                        isSunk
+                                                            ? 'bg-rose-400'
+                                                            : isPlaced
+                                                              ? 'bg-emerald-400'
+                                                              : 'bg-white/15'
+                                                    }`}
                                                 />
                                             ))}
                                         </div>
@@ -374,21 +385,27 @@ const BattleshipComponent = () => {
 
                     {gameState !== 'setup' && (
                         <div>
-                            <h4 className="text-xs uppercase text-white/40 mb-2 font-bold">Enemy Fleet</h4>
+                            <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                                Enemy fleet
+                            </h4>
                             <div className="flex flex-col gap-2">
                                 {SHIP_CONFIG.map((ship) => {
                                     const isSunk = sunkComputerShips.includes(ship.name);
                                     return (
                                         <div
                                             key={ship.name}
-                                            className={`flex items-center justify-between text-sm ${isSunk ? 'text-red-400 line-through' : 'text-white/60'}`}
+                                            className={`flex items-center justify-between text-sm ${
+                                                isSunk ? 'text-rose-400 line-through' : 'text-muted-foreground'
+                                            }`}
                                         >
                                             <span>{ship.name}</span>
                                             <div className="flex gap-1">
                                                 {Array.from({ length: ship.length }).map((_, i) => (
                                                     <div
                                                         key={i}
-                                                        className={`w-1.5 h-1.5 rounded-full ${isSunk ? 'bg-red-400' : 'bg-red-500/20'}`}
+                                                        className={`h-1.5 w-1.5 rounded-full ${
+                                                            isSunk ? 'bg-rose-400' : 'bg-rose-500/25'
+                                                        }`}
                                                     />
                                                 ))}
                                             </div>
@@ -403,9 +420,9 @@ const BattleshipComponent = () => {
                         <button
                             type="button"
                             onClick={startNewGame}
-                            className="mt-8 w-full glass-button px-4 py-3 rounded-xl flex items-center justify-center gap-2 font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            className="glass-button mt-8 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                         >
-                            <RefreshCw size={20} /> Play Again
+                            <RefreshCw size={18} aria-hidden /> Play Again
                         </button>
                     )}
                 </div>

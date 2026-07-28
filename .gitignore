@@ -13,6 +13,10 @@ web-app/dist-ssr/
 # Local UI audit artifacts (not product source)
 design-plans/
 
+# Local uncommitted AI skills
+.skills/
+design-system/
+
 # C extensions
 *.so
 

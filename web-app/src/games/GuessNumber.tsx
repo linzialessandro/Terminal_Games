@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GameRulesModal from '../components/GameRulesModal';
-import { RefreshCw, ArrowLeft, Trophy, Info } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import GameHeader from '../components/GameHeader';
+import { RefreshCw, Trophy } from 'lucide-react';
+
+const randomInRange = (max: number) => Math.floor(Math.random() * max) + 1;
 
 const GuessNumber: React.FC = () => {
     const [difficulty, setDifficulty] = useState<number | null>(null);
@@ -20,7 +22,7 @@ const GuessNumber: React.FC = () => {
         if (level === 3) max = 200;
 
         setDifficulty(level);
-        setTarget(Math.floor(Math.random() * max) + 1);
+        setTarget(randomInRange(max));
         setMessage(`I'm thinking of a number between 1 and ${max}.`);
         setAttempts(0);
         setGameOver(false);
@@ -65,29 +67,26 @@ const GuessNumber: React.FC = () => {
     };
 
     const rules = [
-        "Select a difficulty level to determine the range of numbers.",
-        "Enter your guess in the input field.",
-        "I will tell you if your guess is too high or too low.",
-        "Keep guessing until you find the secret number!",
-        "Try to guess it in as few attempts as possible."
+        'Select a difficulty level to determine the range of numbers.',
+        'Enter your guess in the input field.',
+        'I will tell you if your guess is too high or too low.',
+        'Keep guessing until you find the secret number!',
+        'Try to guess it in as few attempts as possible.',
+    ];
+
+    const difficulties = [
+        { level: 1, label: 'Easy', range: '1 – 50', color: 'text-sky-400', hover: 'hover:ring-sky-400/40' },
+        { level: 2, label: 'Medium', range: '1 – 100', color: 'text-violet-400', hover: 'hover:ring-violet-400/40' },
+        { level: 3, label: 'Hard', range: '1 – 200', color: 'text-rose-400', hover: 'hover:ring-rose-400/40' },
     ];
 
     return (
-        <div className="flex flex-col items-center w-full max-w-2xl mx-auto">
-            <div className="flex items-center justify-between w-full mb-8">
-                <Link to="/" className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                    <ArrowLeft className="w-6 h-6" />
-                </Link>
-                <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">
-                    Guess the Number
-                </h2>
-                <button
-                    onClick={() => setShowRules(true)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-blue-300"
-                >
-                    <Info className="w-6 h-6" />
-                </button>
-            </div>
+        <div className="mx-auto flex w-full max-w-2xl flex-col">
+            <GameHeader
+                title="Guess the Number"
+                accentClassName="from-sky-400 to-violet-500"
+                onShowRules={() => setShowRules(true)}
+            />
 
             <GameRulesModal
                 isOpen={showRules}
@@ -99,58 +98,56 @@ const GuessNumber: React.FC = () => {
 
             {!difficulty ? (
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col gap-4 w-full"
+                    className="flex w-full flex-col gap-3"
                 >
-                    <p className="text-center text-lg mb-4 text-white/80">Select Difficulty Level</p>
-                    <button onClick={() => startGame(1)} className="glass-button p-4 rounded-xl text-left hover:border-blue-400/50">
-                        <div className="font-bold text-lg text-blue-400">Easy</div>
-                        <div className="text-sm opacity-60">Range: 1 - 50</div>
-                    </button>
-                    <button onClick={() => startGame(2)} className="glass-button p-4 rounded-xl text-left hover:border-purple-400/50">
-                        <div className="font-bold text-lg text-purple-400">Medium</div>
-                        <div className="text-sm opacity-60">Range: 1 - 100</div>
-                    </button>
-                    <button onClick={() => startGame(3)} className="glass-button p-4 rounded-xl text-left hover:border-pink-400/50">
-                        <div className="font-bold text-lg text-pink-400">Hard</div>
-                        <div className="text-sm opacity-60">Range: 1 - 200</div>
-                    </button>
+                    <p className="mb-2 text-center text-sm text-muted-foreground">Select difficulty</p>
+                    {difficulties.map((d) => (
+                        <button
+                            key={d.level}
+                            type="button"
+                            onClick={() => startGame(d.level)}
+                            className={`glass-button rounded-2xl p-5 text-left ring-1 ring-white/[0.04] transition-all duration-200 ease-cinema ${d.hover}`}
+                        >
+                            <div className={`text-lg font-semibold ${d.color}`}>{d.label}</div>
+                            <div className="mt-0.5 text-sm text-muted-foreground">Range: {d.range}</div>
+                        </button>
+                    ))}
                 </motion.div>
             ) : (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="w-full flex flex-col items-center"
-                >
-                    <div className="glass-panel p-6 rounded-2xl w-full mb-6 text-center">
-                        <p className="text-xl mb-2">{message}</p>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex w-full flex-col items-center">
+                    <div className="glass-panel mb-6 w-full rounded-2xl p-6 text-center">
+                        <p className="text-lg text-foreground/90">{message}</p>
                         {gameOver && (
                             <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                className="flex flex-col items-center mt-4 text-yellow-400"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                className="mt-5 flex flex-col items-center text-amber-400"
                             >
-                                <Trophy size={48} className="mb-2" />
-                                <p className="font-bold">You won in {attempts} attempts!</p>
+                                <Trophy size={44} className="mb-2" aria-hidden />
+                                <p className="font-semibold text-foreground">
+                                    You won in <span className="font-mono text-amber-400">{attempts}</span> attempts!
+                                </p>
                             </motion.div>
                         )}
                     </div>
 
                     {!gameOver && (
-                        <form onSubmit={handleGuess} className="flex gap-2 w-full max-w-md mb-8">
+                        <form onSubmit={handleGuess} className="mb-8 flex w-full max-w-md gap-2">
+                            <label className="sr-only" htmlFor="guess-input">
+                                Your guess
+                            </label>
                             <input
+                                id="guess-input"
                                 type="number"
                                 value={guess}
                                 onChange={(e) => setGuess(e.target.value)}
-                                placeholder="Enter your guess..."
-                                className="flex-1 bg-black/30 border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors"
+                                placeholder="Enter your guess…"
+                                className="surface-inset flex-1 rounded-xl px-4 py-3 font-mono text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                                 autoFocus
                             />
-                            <button
-                                type="submit"
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-                            >
+                            <button type="submit" className="btn-primary rounded-xl px-6 py-3 text-sm">
                                 Guess
                             </button>
                         </form>
@@ -158,31 +155,41 @@ const GuessNumber: React.FC = () => {
 
                     {gameOver && (
                         <button
+                            type="button"
                             onClick={resetGame}
-                            className="glass-button flex items-center gap-2 px-6 py-3 rounded-xl mb-8"
+                            className="glass-button mb-8 flex items-center gap-2 rounded-xl px-6 py-3"
                         >
-                            <RefreshCw size={20} />
+                            <RefreshCw size={18} aria-hidden />
                             Play Again
                         </button>
                     )}
 
                     <div className="w-full max-w-md">
-                        <h3 className="text-sm font-medium text-white/50 mb-2 uppercase tracking-wider">History</h3>
+                        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            History
+                        </h3>
                         <div className="flex flex-col gap-2">
                             <AnimatePresence>
                                 {history.map((item, index) => (
                                     <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, x: -20 }}
+                                        key={`${item.value}-${index}`}
+                                        initial={{ opacity: 0, x: -12 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0 }}
-                                        className="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/5"
+                                        className="flex items-center justify-between rounded-xl surface-inset px-4 py-3"
                                     >
                                         <span className="font-mono text-lg">{item.value}</span>
-                                        <span className={`text-sm ${item.result.includes('low') ? 'text-blue-400' :
-                                            item.result.includes('high') ? 'text-red-400' :
-                                                'text-green-400'
-                                            }`}>{item.result}</span>
+                                        <span
+                                            className={`text-sm font-medium ${
+                                                item.result.includes('low')
+                                                    ? 'text-sky-400'
+                                                    : item.result.includes('high')
+                                                      ? 'text-rose-400'
+                                                      : 'text-emerald-400'
+                                            }`}
+                                        >
+                                            {item.result}
+                                        </span>
                                     </motion.div>
                                 ))}
                             </AnimatePresence>
