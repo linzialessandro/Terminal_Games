@@ -145,7 +145,7 @@ const Hangman: React.FC = () => {
                         </div>
                         <button
                             onClick={startNewGame}
-                            className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center gap-2 transition-colors font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
+                            className="glass-button w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
                         >
                             <RefreshCw size={20} />
                             New Game

@@ -132,7 +132,7 @@ const RockPaperScissors: React.FC = () => {
                         </p>
                         <button
                             onClick={resetMatch}
-                            className="bg-white/10 hover:bg-white/20 px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors mt-4"
+                            className="glass-button px-8 py-3 rounded-xl font-bold flex items-center gap-2 mt-4"
                         >
                             <RefreshCw size={20} /> Play Again
                         </button>

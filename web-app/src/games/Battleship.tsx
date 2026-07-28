@@ -318,7 +318,7 @@ const BattleshipComponent = () => {
                         <button
                             type="button"
                             onClick={() => setIsHorizontal(!isHorizontal)}
-                            className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                            className="glass-button px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
                         >
                             <RotateCcw size={16} /> Rotate: {isHorizontal ? 'Horizontal' : 'Vertical'}
                         </button>

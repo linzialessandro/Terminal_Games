@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 
 const games = [
-    { path: '/guess-number', name: 'Guess Number', icon: Gamepad2, color: 'text-blue-400' },
-    { path: '/roll-dice', name: 'Roll Dice', icon: Dices, color: 'text-purple-400' },
+    { path: '/guess-number', name: 'Guess the Number', icon: Gamepad2, color: 'text-blue-400' },
+    { path: '/roll-dice', name: 'Roll the Dice', icon: Dices, color: 'text-purple-400' },
     { path: '/hangman', name: 'Hangman', icon: Type, color: 'text-green-400' },
     { path: '/mastermind', name: 'Mastermind', icon: Lock, color: 'text-yellow-400' },
     { path: '/minesweeper', name: 'Minesweeper', icon: Bomb, color: 'text-red-400' },

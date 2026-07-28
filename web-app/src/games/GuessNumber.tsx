@@ -159,7 +159,7 @@ const GuessNumber: React.FC = () => {
                     {gameOver && (
                         <button
                             onClick={resetGame}
-                            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-6 py-3 rounded-lg transition-colors mb-8"
+                            className="glass-button flex items-center gap-2 px-6 py-3 rounded-xl mb-8"
                         >
                             <RefreshCw size={20} />
                             Play Again

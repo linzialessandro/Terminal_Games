@@ -142,7 +142,7 @@ const Mastermind: React.FC = () => {
                 ) : (
                     <button
                         onClick={startNewGame}
-                        className="w-full bg-white/10 hover:bg-white/20 py-4 rounded-xl font-bold flex items-center justify-center gap-2 mb-6 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+                        className="glass-button w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
                     >
                         <RefreshCw /> Play Again
                     </button>

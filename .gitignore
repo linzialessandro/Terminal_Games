@@ -10,6 +10,9 @@ web-app/dist-ssr/
 *.local
 .DS_Store
 
+# Local UI audit artifacts (not product source)
+design-plans/
+
 # C extensions
 *.so
 
